@@ -1,0 +1,55 @@
+@startuml
+title Facade Pattern for Video Conversion
+left to right direction
+skinparam classAttributeIconSize 0
+
+class Main <<client>>
+class VideoConversionFacade <<facade>> {
+  + convert(input: VideoAsset, outputFormat: VideoFormat): ConversionResult
+}
+
+package "facade.subsystem" {
+  class CodecFactory
+  class BitrateReader
+  class AudioMixer
+  class MediaMuxer
+  class Codec
+  class VideoStream
+  class ConvertedVideo
+}
+
+package "facade.model" {
+  class VideoAsset <<record>>
+  class VideoFrame <<record>>
+  class AudioTrack <<record>>
+  enum VideoFormat
+}
+
+class ConversionResult <<record>>
+class ConversionException
+
+Main --> VideoConversionFacade : convert()
+Main ..> VideoAsset : prepares input
+VideoConversionFacade ..> VideoAsset : accepts
+VideoConversionFacade ..> VideoFormat : accepts
+VideoConversionFacade ..> ConversionResult : returns
+VideoConversionFacade ..> ConversionException : reports failures
+VideoConversionFacade --> CodecFactory
+VideoConversionFacade --> BitrateReader
+VideoConversionFacade --> AudioMixer
+VideoConversionFacade --> MediaMuxer
+CodecFactory ..> Codec : selects
+BitrateReader ..> VideoStream : decodes / transcodes
+AudioMixer ..> AudioTrack : mixes / normalizes
+MediaMuxer ..> ConvertedVideo : assembles
+VideoAsset *-- VideoFrame
+VideoAsset *-- AudioTrack
+VideoAsset ..> VideoFormat
+Codec ..> VideoFormat
+ConvertedVideo ..> VideoFormat
+
+note bottom of VideoConversionFacade
+  Subsystems have no reference to the facade
+  and remain usable directly by advanced clients.
+end note
+@enduml
