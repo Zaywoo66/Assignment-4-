@@ -27,6 +27,10 @@ src/main/java/facade/
 ├── api/                              Public facade API and result
 ├── model/                            Input and output value types
 └── subsystem/                        Independent conversion components
+src/test/java/
+├── facade/api/                       Facade conversion tests
+├── facade/model/                     Input validation tests
+└── facade/subsystem/                 Audio mixing tests
 docs/
 ├── uml.puml                          PlantUML class diagram
 ├── clean-code-notes.md               Five Clean Code principles
@@ -37,14 +41,29 @@ Subsystem classes have no reference to the facade. They are public and can be us
 
 ## Build and run
 
-Install JDK 17 or newer and Maven, then run:
+Install JDK 17 or newer and Maven. Run the automatic tests with:
 
 ```sh
-mvn clean compile
+mvn test
+```
+
+To build the project and run the media and video conversion demonstration:
+
+```sh
+mvn clean package
 mvn -q exec:java -Dexec.mainClass=facade.Main
 ```
 
 In PowerShell, quote the Maven property: `mvn -q exec:java '-Dexec.mainClass=facade.Main'`.
+
+The simple client-side conversion call is:
+
+```java
+ConversionResult result = new VideoConversionFacade()
+        .convert(inputVideo, VideoFormat.MP4);
+```
+
+`Main` supplies a small in-memory AVI example and runs this conversion for both MP4 and WEBM, then prints each result. The JUnit tests check those output summaries, target bitrate limits, audio mixing and normalization, empty audio input, and invalid video inputs.
 
 ## Example output
 
